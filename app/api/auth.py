@@ -1,4 +1,5 @@
-from datetime import timedelta
+# app/api/auth.py
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -91,7 +92,7 @@ async def login(
     )
     
     # Update last login date
-    user.last_login_date = now()
+    user.last_login_date = datetime.utcnow()
     db.commit()
     
     return {

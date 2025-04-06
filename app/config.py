@@ -1,4 +1,5 @@
-from pydantic import BaseSettings
+# app/config.py
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     # API Configuration
@@ -6,15 +7,13 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Pythonchick API"
     
     # Security
-    SECRET_KEY: str = "your-secret-key-for-development"  # Change this in production!
+    SECRET_KEY: str = "u-know-who-am-i"
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     
-    # Database - Update with your actual MSSQL connection string
-    DATABASE_URL: str = "mssql+pyodbc://username:password@server/database?driver=ODBC+Driver+17+for+SQL+Server"
+    # Database
+    DATABASE_URL: str = "mssql+pyodbc://username:password@server_name/database_name?driver=ODBC+Driver+17+for+SQL+Server"
     
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 
 settings = Settings()

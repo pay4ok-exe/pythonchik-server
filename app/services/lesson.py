@@ -1,5 +1,12 @@
+# app/services/lesson.py
 from sqlalchemy.orm import Session
 from app.models.lesson import Lesson
+from app.models.progress import UserProgress
+from app.models.user import User
+from datetime import datetime
+from sqlalchemy.orm import Session
+from app.models.lesson import Lesson
+from app.models.topic import Topic  # Add this import
 from app.models.progress import UserProgress
 from app.models.user import User
 from datetime import datetime

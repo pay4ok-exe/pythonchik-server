@@ -1,7 +1,9 @@
+# scripts/seed_courses.py
 import sys
 import os
 import json
 from sqlalchemy.orm import Session
+import os.path
 
 # Add parent directory to path to import from app
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -16,8 +18,14 @@ def seed_courses():
     db = SessionLocal()
     
     try:
+        # Check if mock.json exists
+        mock_file_path = "mock.json"
+        if not os.path.isfile(mock_file_path):
+            print(f"Error: File '{mock_file_path}' not found.")
+            return
+            
         # Read mock data
-        with open("mock.json", "r") as file:
+        with open(mock_file_path, "r", encoding='utf-8') as file:
             data = json.load(file)
         
         # Process courses
@@ -79,10 +87,7 @@ def seed_courses():
                     elif lesson_type == "coding":
                         lesson.task = lesson_data.get("task", "")
                         lesson.expected_output = lesson_data.get("expectedOutput", "")
-                    elif lesson_type == "quiz":
-                        # Store quiz questions separately
-                        pass
-                        
+                    
                     db.add(lesson)
                     db.flush()
                     
