@@ -11,6 +11,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.models.course import Course
 from app.models.topic import Topic
 from app.models.lesson import Lesson
+from app.models.coding_challenge import CodingChallenge
 from app.models.quiz import QuizQuestion, QuizOption
 from app.utils.database import SessionLocal
 
@@ -83,15 +84,23 @@ def seed_courses():
                     
                     # Add type-specific data
                     if lesson_type == "lesson":
-                        lesson.content = lesson_data.get("content", [])
-                    elif lesson_type == "coding":
-                        lesson.task = lesson_data.get("task", "")
-                        lesson.expected_output = lesson_data.get("expectedOutput", "")
-                    
+                        lesson.parsed_content = lesson_data.get("content", [])
+
                     db.add(lesson)
                     db.flush()
                     
                     print(f"    Added lesson: {lesson.title}")
+
+                    if lesson_type == "coding":
+                        coding_challenge = CodingChallenge(
+                            lesson_id=lesson.id,
+                            instructions=lesson_data.get("task", ""),
+                            expected_output=lesson_data.get("expectedOutput", ""),
+                            solution_code="",
+                            initial_code=""
+                        )
+                        db.add(coding_challenge)
+                        db.flush()
                     
                     # Add quiz questions if this is a quiz lesson
                     if lesson_type == "quiz" and "questions" in lesson_data:

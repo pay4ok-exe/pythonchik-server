@@ -10,9 +10,8 @@ class Lesson(Base):
     topic_id = Column(Integer, ForeignKey("topics.id"), nullable=False)
     title = Column(String(100), nullable=False)
     type = Column(String(20), nullable=False)  # 'lesson', 'quiz', 'coding'
-    content_json = Column(Text)  # Store content as JSON string
-    task = Column(Text)  # For coding lessons
-    expected_output = Column(Text)  # For coding lessons
+    content = Column(Text)
+    content = Column(Text, nullable=True)
     order_index = Column(Integer, nullable=False)
     xp_reward = Column(Integer, default=10)
     coins_reward = Column(Integer, default=5)
@@ -26,13 +25,11 @@ class Lesson(Base):
     user_progress = relationship("UserProgress", back_populates="lesson")
 
     @property
-    def content(self):
-        """Deserialize JSON content"""
-        if self.content_json:
-            return json.loads(self.content_json)
+    def parsed_content(self):
+        if self.content:
+            return json.loads(self.content)
         return []
 
-    @content.setter
-    def content(self, content_list):
-        """Serialize content to JSON"""
-        self.content_json = json.dumps(content_list)
+    @parsed_content.setter
+    def parsed_content(self, value):
+        self.content = json.dumps(value)

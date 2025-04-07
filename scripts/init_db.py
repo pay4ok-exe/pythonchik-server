@@ -2,7 +2,6 @@
 import sys
 import os
 import pyodbc
-import urllib.parse
 from sqlalchemy import inspect
 
 # Add parent directory to path to import from app
@@ -19,59 +18,28 @@ from app.models.activity import UserActivity
 from app.utils.database import Base, engine, settings
 
 def init_db():
-    # Check if database exists
     try:
-        conn_str = settings.DATABASE_URL.replace('+pyodbc', '')
-        server = conn_str.split('@')[1].split('/')[0]
-        database = conn_str.split('/')[-1].split('?')[0]
-        username = conn_str.split('//')[1].split(':')[0]
-        password = conn_str.split(':')[2].split('@')[0]
-        driver = conn_str.split('driver=')[1]
+        # First verify connection using pyodbc directly
+        conn_str = "DRIVER={ODBC Driver 17 for SQL Server};SERVER=localhost;DATABASE=Pythonchick;Trusted_Connection=yes;"
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+        cursor.execute("SELECT @@SERVERNAME")
+        row = cursor.fetchone()
+        print(f"Direct connection successful to server: {row[0]}")
+        conn.close()
         
-        # Connect to master database to check if our DB exists
-        master_conn = pyodbc.connect(f'DRIVER={{{driver}}};SERVER={server};DATABASE=master;UID={username};PWD={password}')
-        cursor = master_conn.cursor()
-        
-        # Check if database exists
-        cursor.execute(f"SELECT name FROM sys.databases WHERE name = N'{database}'")
-        result = cursor.fetchone()
-        
-        if not result:
-            print(f"Database '{database}' does not exist. Creating...")
-            cursor.execute(f"CREATE DATABASE {database}")
-            master_conn.commit()
-            print(f"Database '{database}' created successfully.")
-        else:
-            print(f"Database '{database}' already exists.")
-            
-        cursor.close()
-        master_conn.close()
-    except Exception as e:
-        print(f"Error checking/creating database: {e}")
-        return
-    
-    # Create tables in our database
-    try:
-        # Get existing tables
-        inspector = inspect(engine)
-        existing_tables = inspector.get_table_names()
-        
-        # Create all tables if they don't exist
+        # Now use SQLAlchemy to create tables
         Base.metadata.create_all(bind=engine)
-        
-        # Print results
-        all_tables = set(Base.metadata.tables.keys())
-        new_tables = all_tables - set(existing_tables)
-        
-        if new_tables:
-            print(f"Created tables: {', '.join(new_tables)}")
-        else:
-            print("All tables already exist.")
-            
-        print("Database initialization completed successfully!")
+        inspector = inspect(engine)
+        print("✅ Tables in DB:")
+        for table_name in inspector.get_table_names():
+            print(f" - {table_name}")
+
+        print("Database tables created successfully!")
         
     except Exception as e:
-        print(f"Error creating tables: {e}")
+        print(f"Error initializing database: {e}")
+        print("Please ensure the database exists and your Windows user has appropriate permissions.")
 
 if __name__ == "__main__":
     init_db()

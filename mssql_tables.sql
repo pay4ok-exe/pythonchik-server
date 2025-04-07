@@ -177,3 +177,15 @@ CREATE TABLE user_daily_goals (
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE()
 );
+
+CREATE TABLE coding_challenges (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    lesson_id INT NOT NULL,
+    instructions TEXT NOT NULL,
+    initial_code TEXT,
+    solution_code TEXT NOT NULL,
+    expected_output TEXT,
+    FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE,
+    created_at DATETIME DEFAULT GETDATE(),
+    updated_at DATETIME DEFAULT GETDATE()
+);
