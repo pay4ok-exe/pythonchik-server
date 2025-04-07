@@ -25,3 +25,4 @@ class User(Base):
     progress = relationship("UserProgress", back_populates="user")
     achievements = relationship("UserAchievement", back_populates="user")
     activities = relationship("UserActivity", back_populates="user")
+    challenges = relationship("UserChallenge", back_populates="user")

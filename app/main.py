@@ -1,11 +1,19 @@
+# app/main.py - Update this file
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.staticfiles import StaticFiles
 from app.config import settings
-from app.api import auth, courses, topics, lessons, users, progress
+from app.api import auth, courses, topics, lessons, users, progress, code_execution
 
+# Create the FastAPI app with documentation settings
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
+    description="API for Pythonchick, an interactive Python learning platform for kids",
+    version="1.0.0",
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    docs_url=None  # We'll create a custom endpoint for docs
 )
 
 # Set up CORS
@@ -29,7 +37,21 @@ app.include_router(topics.router, prefix=settings.API_V1_STR)
 app.include_router(lessons.router, prefix=settings.API_V1_STR)
 app.include_router(users.router, prefix=settings.API_V1_STR)
 app.include_router(progress.router, prefix=settings.API_V1_STR)
+app.include_router(code_execution.router, prefix=settings.API_V1_STR)
+
+# Mount static files (if needed)
+# app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Custom Swagger UI
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url=f"{settings.API_V1_STR}/openapi.json",
+        title=f"{settings.PROJECT_NAME} - API Documentation",
+        swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@4/swagger-ui-bundle.js",
+        swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@4/swagger-ui.css",
+    )
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the Pythonchick API"}
+    return {"message": "Welcome to the Pythonchick API", "docs": "/docs"}

@@ -7,3 +7,4 @@ from .quiz import QuizQuestion, QuizOption
 from .progress import UserProgress
 from .achievement import UserAchievement
 from .activity import UserActivity
+from .challenge import CodingChallenge, UserChallenge
