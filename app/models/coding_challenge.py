@@ -3,6 +3,14 @@ from app.utils.database import Base
 
 class CodingChallenge(Base):
     __tablename__ = "coding_challenges"
+    __table_args__ = {'extend_existing': True}
+    __table_args__ = {'extend_existing': True}
+    __table_args__ = {'extend_existing': True}
+    __table_args__ = {'extend_existing': True}
+    __table_args__ = {'extend_existing': True}
+    __table_args__ = {'extend_existing': True}
+    __table_args__ = {'extend_existing': True}
+    __table_args__ = {'extend_existing': True}
 
     id = Column(Integer, primary_key=True, index=True)
     lesson_id = Column(Integer, ForeignKey("lessons.id"), nullable=False)

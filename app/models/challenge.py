@@ -4,6 +4,9 @@ from sqlalchemy.orm import relationship
 from app.utils.database import Base
 
 class CodingChallenge(Base):
+    __table_args__ = {'extend_existing': True}
+    __table_args__ = {'extend_existing': True}
+    __table_args__ = {'extend_existing': True}
     __tablename__ = "coding_challenges"
 
     id = Column(Integer, primary_key=True, index=True)

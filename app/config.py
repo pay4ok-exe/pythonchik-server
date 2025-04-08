@@ -11,13 +11,11 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     
-    # Database
-    # DATABASE_URL: str = "mssql+pyodbc://@pay4ok/Pythonchick?driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes"
-    DATABASE_URL: str = "mssql+pyodbc://pay4ok\\pay4ok/Pythonchick?driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes"
+    # Database - Using SQLite for simplicity
+    DATABASE_URL: str = "sqlite:///./pythonchick.db"
     
     class Config:
         env_file = ".env"
         case_sensitive = True
 
 settings = Settings()
-print(f"✅ Loaded DATABASE_URL from settings: {settings.DATABASE_URL}")

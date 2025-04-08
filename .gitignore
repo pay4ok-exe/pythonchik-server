@@ -112,3 +112,6 @@ ipython_config.py
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+.bat
+.bat.*
