@@ -2,11 +2,18 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import os
+from app.config import settings
 
-# Create SQLAlchemy engine with SQLite for simplicity
+# Get database URL from environment variable or settings
+DATABASE_URL = os.getenv('DATABASE_URL', settings.DATABASE_URL)
+
+# Create SQLAlchemy engine
 engine = create_engine(
-    "sqlite:///./pythonchick.db", 
-    connect_args={"check_same_thread": False}
+    DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=3600,
+    echo=False  # Set to True for debugging SQL queries
 )
 
 # Create session factory

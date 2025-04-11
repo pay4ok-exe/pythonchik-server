@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: pythonchick-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: pythonchick
+      MYSQL_USER: pythonchick
+      MYSQL_PASSWORD: pythonchick
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      
+  # Backend API (FastAPI)
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: pythonchick-backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=mysql+pymysql://pythonchick:pythonchick@mysql:3306/pythonchick
+      - SECRET_KEY=u-know-who-am-i
+      - ACCESS_TOKEN_EXPIRE_MINUTES=60
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./:/app
+
+volumes:
+  mysql_data:

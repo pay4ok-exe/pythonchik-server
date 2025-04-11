@@ -1,3 +1,4 @@
+# app/models/lesson.py
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, func
 from sqlalchemy.orm import relationship
 from app.utils.database import Base
@@ -10,8 +11,9 @@ class Lesson(Base):
     topic_id = Column(Integer, ForeignKey("topics.id"), nullable=False)
     title = Column(String(100), nullable=False)
     type = Column(String(20), nullable=False)  # 'lesson', 'quiz', 'coding'
-    content = Column(Text)
     content = Column(Text, nullable=True)
+    task = Column(Text, nullable=True)
+    expected_output = Column(Text, nullable=True)
     order_index = Column(Integer, nullable=False)
     xp_reward = Column(Integer, default=10)
     coins_reward = Column(Integer, default=5)
@@ -23,11 +25,15 @@ class Lesson(Base):
     topic = relationship("Topic", back_populates="lessons")
     quiz_questions = relationship("QuizQuestion", back_populates="lesson", cascade="all, delete-orphan")
     user_progress = relationship("UserProgress", back_populates="lesson")
+    challenges = relationship("CodingChallenge", back_populates="lesson", cascade="all, delete-orphan")
 
     @property
     def parsed_content(self):
-        if self.content:
-            return json.loads(self.content)
+        if self.content and self.content.strip():
+            try:
+                return json.loads(self.content)
+            except json.JSONDecodeError:
+                return []
         return []
 
     @parsed_content.setter

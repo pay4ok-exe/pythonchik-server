@@ -4,22 +4,23 @@ from sqlalchemy.orm import relationship
 from app.utils.database import Base
 
 class CodingChallenge(Base):
-    __table_args__ = {'extend_existing': True}
-    __table_args__ = {'extend_existing': True}
-    __table_args__ = {'extend_existing': True}
     __tablename__ = "coding_challenges"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String(100), nullable=False)
-    description = Column(Text, nullable=False)
-    difficulty = Column(String(20), nullable=False)  # beginner, intermediate, advanced
-    starter_code = Column(Text, nullable=False)
-    solution_code = Column(Text, nullable=False)
-    expected_output = Column(Text, nullable=False)
+    title = Column(String(100), nullable=True)
+    description = Column(Text, nullable=True)
+    difficulty = Column(String(20), nullable=True)  # beginner, intermediate, advanced
+    starter_code = Column(Text, nullable=True)
+    solution_code = Column(Text, nullable=True)
+    expected_output = Column(Text, nullable=True)
     hints = Column(Text, nullable=True)  # Store as JSON string
     points = Column(Integer, default=10)
+    lesson_id = Column(Integer, ForeignKey("lessons.id", ondelete="CASCADE"), nullable=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
+    # Relationship with lesson (if associated with a specific lesson)
+    lesson = relationship("Lesson", back_populates="challenges")
 
 class UserChallenge(Base):
     __tablename__ = "user_challenges"
