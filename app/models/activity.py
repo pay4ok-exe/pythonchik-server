@@ -9,7 +9,7 @@ class UserActivity(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     activity_type = Column(String(50), nullable=False)
-    activity_data = Column(String, nullable=True)  # JSON data stored as string
+    activity_data = Column(String(255), nullable=True)  # Added length specification
     xp_earned = Column(Integer, default=0)
     coins_earned = Column(Integer, default=0)
     created_at = Column(DateTime, default=func.now())
