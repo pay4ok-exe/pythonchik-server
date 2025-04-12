@@ -37,11 +37,37 @@ class TopicService:
                     "order_index": lesson.order_index
                 })
                 
+            # Determine if the topic should be locked based on previous topics
+            is_locked = True
+            if not topic.is_locked:
+                is_locked = False
+            elif user_id:
+                # If this is the first topic of the course, it should be unlocked
+                if topic.order_index == 0:
+                    is_locked = False
+                else:
+                    # Check the previous topic's completion status
+                    previous_topic = self.db.query(Topic).filter(
+                        Topic.course_id == topic.course_id,
+                        Topic.order_index == topic.order_index - 1
+                    ).first()
+                    
+                    if previous_topic:
+                        # Check if all lessons in the previous topic are completed
+                        previous_topic_lesson_ids = [l.id for l in previous_topic.lessons]
+                        completed_previous_lessons = self.db.query(UserProgress).filter(
+                            UserProgress.user_id == user_id,
+                            UserProgress.lesson_id.in_(previous_topic_lesson_ids),
+                            UserProgress.is_completed == True
+                        ).count()
+                        
+                        is_locked = completed_previous_lessons < len(previous_topic_lesson_ids)
+            
             return {
                 "id": topic.id,
                 "title": topic.title,
                 "description": topic.description,
-                "is_locked": topic.is_locked,
+                "is_locked": is_locked,
                 "course_id": topic.course_id,
                 "order_index": topic.order_index,
                 "lessons": lessons

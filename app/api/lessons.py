@@ -2,13 +2,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import Optional
-from app.schemas.lesson import LessonDetailResponse, CompleteLessonRequest
+from app.schemas.lesson import LessonDetailResponse
 from app.services.lesson import LessonService
 from app.utils.database import get_db
 
 router = APIRouter(prefix="/lessons", tags=["lessons"])
 
-@router.get("/{lesson_id}", response_model=LessonDetailResponse)
+@router.get("/{lesson_id}", response_model=Optional[LessonDetailResponse])
 async def get_lesson(
     lesson_id: int,
     user_id: Optional[int] = Query(None),
@@ -36,15 +36,24 @@ async def get_lesson(
 @router.post("/{lesson_id}/complete")
 async def complete_lesson(
     lesson_id: int,
-    request: CompleteLessonRequest,
+    request: dict,
     db: Session = Depends(get_db)
 ):
     try:
+        user_id = request.get('user_id')
+        score = request.get('score')
+        
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User ID is required"
+            )
+        
         lesson_service = LessonService(db)
         result = lesson_service.complete_lesson(
             lesson_id=lesson_id,
-            user_id=request.user_id,
-            score=request.score
+            user_id=user_id,
+            score=score
         )
         
         if not result:
@@ -53,7 +62,7 @@ async def complete_lesson(
                 detail="Lesson not found"
             )
             
-        return {"message": "Lesson completed successfully", "xp_earned": result.get("xp_earned")}
+        return result
     except Exception as e:
         # Log the error
         print(f"Error in complete_lesson endpoint: {str(e)}")

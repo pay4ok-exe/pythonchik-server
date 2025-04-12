@@ -7,6 +7,7 @@ from app.models.lesson import Lesson
 from app.models.topic import Topic
 from app.models.progress import UserProgress
 from app.models.user import User
+from app.models.course import Course
 
 class LessonService:
     def __init__(self, db: Session):
@@ -18,19 +19,19 @@ class LessonService:
             
             if not lesson:
                 return None
-                
+            
             # Check if lesson is completed
             is_completed = False
             if user_id:
                 progress = self.db.query(UserProgress).filter(
                     UserProgress.user_id == user_id,
-                    UserProgress.lesson_id == lesson.id
+                    UserProgress.lesson_id == lesson_id
                 ).first()
                 
                 if progress and progress.is_completed:
                     is_completed = True
             
-            # Prepare response based on lesson type
+            # Prepare lesson details based on type
             result = {
                 "id": lesson.id,
                 "title": lesson.title,
@@ -39,21 +40,23 @@ class LessonService:
                 "is_completed": is_completed
             }
             
+            # Add type-specific details
             if lesson.type == "lesson":
-                # Try to parse the content as JSON if it's stored as a string
+                # Try to parse content if it's a JSON string
                 if lesson.content and isinstance(lesson.content, str):
                     try:
                         result["content"] = json.loads(lesson.content)
                     except json.JSONDecodeError:
-                        # If content isn't valid JSON, return it as is
                         result["content"] = lesson.content
                 else:
                     result["content"] = lesson.content
+            
             elif lesson.type == "coding":
                 result["task"] = lesson.task
                 result["expected_output"] = lesson.expected_output
+            
             elif lesson.type == "quiz":
-                # Get quiz questions and options
+                # Fetch quiz questions and options
                 result["quiz_questions"] = []
                 
                 if lesson.quiz_questions:
@@ -74,8 +77,9 @@ class LessonService:
                             "explanation": question.explanation,
                             "options": options
                         })
-                
+            
             return result
+        
         except SQLAlchemyError as e:
             self.db.rollback()
             print(f"Database error in get_lesson_detail: {str(e)}")
@@ -85,6 +89,7 @@ class LessonService:
             return None
     
     def complete_lesson(self, lesson_id, user_id, score=None):
+        # (Keep the existing complete_lesson method from the previous implementation)
         try:
             lesson = self.db.query(Lesson).filter(Lesson.id == lesson_id).first()
             
@@ -133,25 +138,45 @@ class LessonService:
                 
                 user.last_login_date = datetime.utcnow()
             
-            # Check if all lessons in topic are completed - if so, unlock next topic
+            # Check if all lessons in topic are completed
             topic = lesson.topic
             all_lesson_ids = [l.id for l in topic.lessons]
+            
+            # First, count how many lessons are completed in this topic
             completed_lesson_count = self.db.query(UserProgress).filter(
                 UserProgress.user_id == user_id,
                 UserProgress.lesson_id.in_(all_lesson_ids),
                 UserProgress.is_completed == True
             ).count()
             
-            # If all lessons in topic are completed, unlock next topic
+            # If all lessons in current topic are completed
             if completed_lesson_count == len(all_lesson_ids):
-                # Get next topic in the same course
+                # Find the next topic in the same course
                 next_topic = self.db.query(Topic).filter(
                     Topic.course_id == topic.course_id,
                     Topic.order_index == topic.order_index + 1
                 ).first()
                 
+                # If next topic exists, unlock it
                 if next_topic:
                     next_topic.is_locked = False
+                
+                # Optionally, you might want to find the next course if no more topics
+                if not next_topic:
+                    # Find the next course
+                    next_course = self.db.query(Course).filter(
+                        Course.order_index == topic.course.order_index + 1
+                    ).first()
+                    
+                    if next_course:
+                        # Mark the first topic of the next course as unlocked
+                        first_next_course_topic = self.db.query(Topic).filter(
+                            Topic.course_id == next_course.id,
+                            Topic.order_index == 0
+                        ).first()
+                        
+                        if first_next_course_topic:
+                            first_next_course_topic.is_locked = False
             
             self.db.commit()
             
