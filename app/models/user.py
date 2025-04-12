@@ -1,3 +1,4 @@
+# app/models/user.py (update)
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, func
 from sqlalchemy.orm import relationship
 from app.utils.database import Base
@@ -26,3 +27,4 @@ class User(Base):
     achievements = relationship("UserAchievement", back_populates="user")
     activities = relationship("UserActivity", back_populates="user")
     challenges = relationship("UserChallenge", back_populates="user")
+    game_progress = relationship("UserGameProgress", back_populates="user")  # Added this line

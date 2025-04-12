@@ -14,7 +14,7 @@ from app.utils.database import Base
 from app.models import (
     user, course, topic, lesson, 
     progress, quiz, challenge, 
-    achievement, activity
+    achievement, activity, game
 )
 
 # this is the Alembic Config object, which provides

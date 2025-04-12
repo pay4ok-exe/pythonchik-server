@@ -16,7 +16,8 @@ try:
         users, 
         progress, 
         code_execution, 
-        games
+        games,
+        game
     )
     
     # Import the new password reset module
@@ -56,6 +57,7 @@ try:
     app.include_router(progress.router, prefix=settings.API_V1_STR)
     app.include_router(code_execution.router, prefix=settings.API_V1_STR)
     app.include_router(games.router, prefix=settings.API_V1_STR)
+    app.include_router(game.router, prefix=settings.API_V1_STR)
     # Add the password reset router
     app.include_router(password_reset_router, prefix=settings.API_V1_STR)
 
