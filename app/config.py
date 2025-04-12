@@ -7,6 +7,12 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "Pythonchick API"
     
+    # Environment
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
+    
+    # Frontend URL for redirects
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    
     # Security
     SECRET_KEY: str = os.getenv("SECRET_KEY", "u-know-who-am-i")
     ALGORITHM: str = "HS256"
@@ -17,6 +23,14 @@ class Settings(BaseSettings):
         "DATABASE_URL", 
         "mysql+pymysql://pythonchick:pythonchick@localhost:3306/pythonchick"
     )
+    
+    # Email settings
+    SMTP_SERVER: str = os.getenv("SMTP_SERVER", "smtp.gmail.com")
+    SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))
+    SMTP_USERNAME: str = os.getenv("SMTP_USERNAME", "")
+    SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
+    FROM_EMAIL: str = os.getenv("FROM_EMAIL", "no-reply@pythonchick.com")
+    FROM_NAME: str = os.getenv("FROM_NAME", "Pythonchick")
     
     class Config:
         env_file = ".env"

@@ -16,7 +16,7 @@ from app.utils.database import get_db
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/token")
 
 class AuthService:
-    def __init__(self, db: Session = Depends(get_db)):
+    def __init__(self, db: Session = None):
         self.db = db
         self.user_repository = UserRepository(db) if db else None
     
@@ -47,7 +47,8 @@ class AuthService:
             print(f"Error in create_access_token: {str(e)}")
             raise e
     
-    async def get_current_user(self, token: str = Depends(oauth2_scheme)) -> User:
+    # Important: Make this a "callable" method to work properly with FastAPI dependency injection
+    def get_current_user(self, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
@@ -68,12 +69,10 @@ class AuthService:
             raise credentials_exception
         
         try:
-            if not self.user_repository:
-                # If db session wasn't created in __init__, create it now
-                db = next(get_db())
-                self.user_repository = UserRepository(db)
-                
-            user = self.user_repository.get_by_username(token_data.username)
+            # Use the provided db session from dependency
+            user_repository = UserRepository(db)
+            user = user_repository.get_by_username(token_data.username)
+            
             if user is None:
                 raise credentials_exception
                 

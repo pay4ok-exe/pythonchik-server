@@ -2,17 +2,21 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import Optional
-from app.services.auth import AuthService
+from app.services.auth import AuthService, oauth2_scheme
 from app.services.lesson import LessonService
 from app.utils.database import get_db
+from app.models.user import User
 
 router = APIRouter(prefix="/progress", tags=["progress"])
+
+# Create an instance of AuthService for dependency injection
+auth_service = AuthService()
 
 @router.post("/lessons/{lesson_id}/complete")
 async def complete_lesson(
     lesson_id: int,
     score: Optional[int] = Query(None),
-    current_user = Depends(AuthService().get_current_user),
+    current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db)
 ):
     try:

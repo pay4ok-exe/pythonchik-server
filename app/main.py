@@ -18,6 +18,9 @@ try:
         code_execution, 
         games
     )
+    
+    # Import the new password reset module
+    from app.api.password_reset import router as password_reset_router
 
     # Create the FastAPI app
     app = FastAPI(
@@ -53,6 +56,8 @@ try:
     app.include_router(progress.router, prefix=settings.API_V1_STR)
     app.include_router(code_execution.router, prefix=settings.API_V1_STR)
     app.include_router(games.router, prefix=settings.API_V1_STR)
+    # Add the password reset router
+    app.include_router(password_reset_router, prefix=settings.API_V1_STR)
 
     # Redirect root to docs
     @app.get("/", include_in_schema=False)
