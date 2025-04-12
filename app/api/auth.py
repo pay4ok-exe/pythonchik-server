@@ -51,11 +51,22 @@ async def register(
             expires_delta=access_token_expires
         )
         
-        return {
-            **user.__dict__,
+        user_dict = {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "full_name": user.full_name,
+            "level": user.level,
+            "experience": user.experience,
+            "coins": user.coins,
+            "streak": user.streak,
+            "avatar_url": user.avatar_url,
+            "created_at": user.created_at,
             "access_token": access_token,
             "token_type": "bearer"
         }
+        
+        return user_dict
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -136,4 +147,23 @@ async def login(
 async def read_users_me(
     current_user = Depends(AuthService().get_current_user)
 ):
-    return current_user
+    try:
+        # Convert model to dictionary
+        user_dict = {
+            "id": current_user.id,
+            "username": current_user.username,
+            "email": current_user.email,
+            "full_name": current_user.full_name,
+            "level": current_user.level,
+            "experience": current_user.experience,
+            "coins": current_user.coins,
+            "streak": current_user.streak,
+            "avatar_url": current_user.avatar_url,
+            "created_at": current_user.created_at,
+        }
+        return user_dict
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error retrieving user profile: {str(e)}"
+        )
