@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
     
     # Frontend URL for redirects
-    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "https://pythonchik-ui.vercel.app")
     
     # Security
     SECRET_KEY: str = os.getenv("SECRET_KEY", "u-know-who-am-i")
