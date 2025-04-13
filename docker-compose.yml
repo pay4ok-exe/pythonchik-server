@@ -12,7 +12,7 @@ services:
       MYSQL_USER: pythonchick
       MYSQL_PASSWORD: pythonchick
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -25,7 +25,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: Dockerfile.backend
+      dockerfile: Dockerfile
     container_name: pythonchick-backend
     restart: always
     ports:
@@ -34,6 +34,7 @@ services:
       - DATABASE_URL=mysql+pymysql://pythonchick:pythonchick@mysql:3306/pythonchick
       - SECRET_KEY=u-know-who-am-i
       - ACCESS_TOKEN_EXPIRE_MINUTES=60
+      - ENVIRONMENT=production
     depends_on:
       mysql:
         condition: service_healthy

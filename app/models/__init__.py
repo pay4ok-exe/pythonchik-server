@@ -8,3 +8,4 @@ from .progress import UserProgress
 from .achievement import Achievement, UserAchievement
 from .activity import UserActivity
 from .challenge import CodingChallenge, UserChallenge
+from .game import Game, UserGameProgress
