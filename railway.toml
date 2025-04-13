@@ -1,0 +1,12 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "chmod +x railway-startup.sh && ./railway-startup.sh"
+healthcheckPath = "/api/v1/health"
+restartPolicy = "on-failure"
+
+[env]
+PYTHONUNBUFFERED = "1"
+ENVIRONMENT = "production"

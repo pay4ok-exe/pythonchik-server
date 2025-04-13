@@ -19,6 +19,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project files
 COPY . .
 
+# Make the startup script executable
+RUN chmod +x railway-startup.sh
+
 # Set Python path to ensure imports work correctly
 ENV PYTHONPATH=/app
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -27,5 +30,5 @@ ENV PYTHONUNBUFFERED=1
 # Expose port
 EXPOSE 8000
 
-# Start application with Uvicorn for debugging
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start application using the startup script
+CMD ["bash", "railway-startup.sh"]
