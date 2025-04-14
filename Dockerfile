@@ -31,4 +31,4 @@ ENV PYTHONUNBUFFERED=1
 EXPOSE 8000
 
 # Start application using the startup script
-CMD ["bash", "railway-startup.sh"]
+CMD ["/bin/bash", "./railway-startup.sh"]
