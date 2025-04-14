@@ -74,11 +74,6 @@ try:
             openapi_url=f"{settings.API_V1_STR}/openapi.json",
             title=f"{settings.PROJECT_NAME} - API Documentation"
         )
-    @app.get("/health", include_in_schema=False)
-    async def health_check():
-        """Health check endpoint for deployment platforms."""
-        return {"status": "ok"}
-
 
 
 except Exception as e:
