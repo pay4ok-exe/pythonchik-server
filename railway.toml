@@ -3,8 +3,8 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "chmod +x railway-startup.sh && ./railway-startup.sh"
-healthcheckPath = "/api/v1/health"
+startCommand = "python scripts/init_db.py && alembic upgrade head && python scripts/seed_courses.py && python scripts/seed_challenges.py && python scripts/seed_games.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/health"
 restartPolicy = "on-failure"
 
 [env]
