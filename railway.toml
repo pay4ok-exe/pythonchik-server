@@ -3,17 +3,12 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "python scripts/init_db.py && \
-                if [ $? -ne 0 ]; then echo 'DB Initialization failed'; exit 1; fi && \
-                alembic upgrade head && \
-                if [ $? -ne 0 ]; then echo 'Alembic migration failed'; exit 1; fi && \
-                python scripts/seed_courses.py && \
-                if [ $? -ne 0 ]; then echo 'Courses seeding failed'; exit 1; fi && \
-                python scripts/seed_challenges.py && \
-                if [ $? -ne 0 ]; then echo 'Challenges seeding failed'; exit 1; fi && \
-                python scripts/seed_games.py && \
-                if [ $? -ne 0 ]; then echo 'Games seeding failed'; exit 1; fi && \
-                uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+startCommand = "echo 'Running DB initialization...' && python scripts/init_db.py && \
+                echo 'Running Alembic migrations...' && alembic upgrade head && \
+                echo 'Seeding courses...' && python scripts/seed_courses.py && \
+                echo 'Seeding challenges...' && python scripts/seed_challenges.py && \
+                echo 'Seeding games...' && python scripts/seed_games.py && \
+                echo 'Starting Uvicorn server...' && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
 restartPolicy = "on-failure"
 
 [env]
