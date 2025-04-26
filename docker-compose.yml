@@ -38,6 +38,17 @@ services:
         condition: service_healthy
     volumes:
       - ./:/app
+    command: >
+      bash -c "
+        sleep 5 &&
+        python scripts/init_db.py &&
+        alembic revision --autogenerate -m 'initial' || true &&
+        alembic upgrade head &&
+        python scripts/seed_courses.py &&
+        python scripts/seed_challenges.py &&
+        python scripts/seed_games.py &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000
+      "
 
 volumes:
   mysql_data:

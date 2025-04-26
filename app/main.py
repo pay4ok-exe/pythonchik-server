@@ -38,12 +38,15 @@ try:
         "http://localhost:3000",
         "http://frontend:3000",
         "http://127.0.0.1:3000",
-        "https://pythonchik-ui.vercel.app"
+        "https://pythonchik-ui.vercel.app",
+        "http://192.168.1.*",  # Allow any device on your local network
+        "https://192.168.1.*"  # Also allow HTTPS connections
     ]
+
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=origins,
+        allow_origins=["*"],  # Allow all origins temporarily for testing
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
