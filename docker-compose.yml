@@ -1,24 +1,4 @@
 services:
-  # MySQL Database
-  mysql:
-    image: mysql:8.0
-    container_name: pythonchick-mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: pythonchick
-      MYSQL_USER: pythonchick
-      MYSQL_PASSWORD: pythonchick
-    ports:
-      - "3307:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      
   # Backend API (FastAPI)
   backend:
     build:
@@ -29,18 +9,21 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=mysql+pymysql://pythonchick:pythonchick@mysql:3306/pythonchick
+      - DATABASE_URL=mysql+pymysql://root:KLLeQSvrQcpHgUoJObQshpYmivXnFivO@shortline.proxy.rlwy.net:37073/railway
       - SECRET_KEY=u-know-who-am-i
       - ACCESS_TOKEN_EXPIRE_MINUTES=60
+      - SMTP_SERVER=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USERNAME=ospanakim05@gmail.com
+      - SMTP_PASSWORD=oqgx wrsp tlih qbef
+      - FROM_EMAIL=ospanakim05@gmail.com
+      - FROM_NAME=Pythonchick
+      - FRONTEND_URL=https://pythonchik-ui.vercel.app
       - ENVIRONMENT=production
-    depends_on:
-      mysql:
-        condition: service_healthy
     volumes:
       - ./:/app
     command: >
       bash -c "
-        sleep 5 &&
         python scripts/init_db.py &&
         alembic revision --autogenerate -m 'initial' || true &&
         alembic upgrade head &&
